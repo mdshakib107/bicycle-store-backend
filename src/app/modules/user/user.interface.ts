@@ -10,7 +10,7 @@ export interface TUser {
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;
   role:  'admin' | 'customer' ;
-  status: 'active' | 'deactivate ';
+  status: 'active' | 'deactivate';
 }
 
 export interface UserModel extends Model<TUser> {
