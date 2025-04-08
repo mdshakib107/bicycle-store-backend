@@ -23,7 +23,8 @@ const orderSchema = new Schema <TOrder>({
     products: [orderedItem],
     user: {
         type: Schema.Types.ObjectId,
-        required:true
+        required:true,
+        ref: 'User'
     },
     totalPrice: Number,
     isDeleted:{

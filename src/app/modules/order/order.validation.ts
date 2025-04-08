@@ -17,7 +17,16 @@ body: z.object({
     isDeleted: z.boolean()
 })
 })
+const UpdateOrderValidationSchema = z.object({
+body: z.object({
+    products: z.array(orderedItemValidationSchema).optional(),
+    user: z.string().optional(),
+    totalPrice: z.number().optional(),
+    status:z.enum([...Status] as [string, ...string[]]),
+    isDeleted: z.boolean().optional()
+})
+})
 
 
 
-export const OrderValidation = {orderValidationSchema}
+export const OrderValidation = {orderValidationSchema, UpdateOrderValidationSchema}
