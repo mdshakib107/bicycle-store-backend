@@ -1,108 +1,115 @@
-import { Request, Response } from "express"
+import { Request, Response, NextFunction,RequestHandler } from 'express';
+import { ProductServices } from './product.service';
+import productValidationSchema from './product.validation';
+import updateProductSchema from './updateProduct.validation'; 
+import { Product } from './product.model';
+import httpStatus from 'http-status';
+import {sendResponse} from '../../utils/sendResponse';
+import catchAsync from '../../utils/catchAsync';
+//import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
-import { productService } from "./product.service"
 
-const createProduct= async(req:Request,res:Response)=>{
-    try{
-        const body =req.body
-    const result=await productService.createProduct(body)
 
-    res.send({
-        success:true,
-        message:"Product created successfully",
-        result,
+const createABicycle = catchAsync(async (req, res) =>  {
+  
+    const { name,Img, brand, price, type, description, quantity, inStock } = req.body;  
+    const validatedData = productValidationSchema.parse({
+      name,
+      Img,
+      brand,
+      price,
+      type,
+      description,
+      quantity,
+      inStock,
+    });
+    
+    const newProduct = new Product(validatedData);
+     const result = await newProduct.save();
+     
+     sendResponse.sendCreateDataResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Bicycle is created successfully',
+      data: result,
+    });
+  });
+    
+
+const getAllBicycles =  catchAsync(async (req, res) => {
+  
+    const result = await ProductServices.getAllBicyclesFromDB(req.query);
+   // const { searchTerm } = req.query;
+ //const filter: any = {};
+    //if (searchTerm) {
+    //  const regex = new RegExp(searchTerm as string, 'i'); 
+     // filter.$or = [
+      //  { name: regex },
+     // { type: regex },
+     // ];
+    //}
+
+   // const bicycles = await Product.find(filter);
+    sendResponse.sendDataResponse(res, {
+      statusCode: httpStatus.OK,
+    success: true,
+      message:  'Bicycle retrieved successfully',
+      data:result,
     })
-    }catch(error){
-        res.send({
-        status:false,
-        message:"something went wrong",
-        error
-        })  
+  })
+  
+    
 
-    }
-}
+const getASpecificBicycle =  catchAsync(async (req, res) =>  {
 
-const getProducts= async(req:Request,res:Response)=>{
-    try{
-    const result=await productService.getProducts()
+    const { id } = req.params;
 
-    res.send({
-        success:true,
-        message:"Product getting successfully",
-        result,
+    const result = await ProductServices.getASpecificBicycleFromDB(id);
+
+    sendResponse.sendDataResponse(res, {
+      statusCode: httpStatus.OK,
+    success: true,
+      message:  'Bicycle retrieved successfully',
+      data:result,
     })
-    }catch(error){
-        res.send({
-        status:false,
-        message:"something went wrong",
-        error
-        })  
+  });
 
-    }
-}
+const updateABicycle =  catchAsync(async (req, res) => {
+  
+    const validated = updateProductSchema.parse(req); 
+    const { id } = validated.params;
+    const { price, quantity } = validated.body;
 
-const getSingleProduct= async(req:Request,res:Response)=>{
-    try{
-        const id =req.params.id
-    const result=await productService.getSingleProduct(id)
-
-    res.send({
-        success:true,
-        message:"your Product gets successfully",
-        result,
+    const updatedProduct = await ProductServices.updateABicycleFromDB(id, { price, quantity });
+   
+    sendResponse.sendDataResponse(res, {
+      statusCode: httpStatus.OK,
+    success: true,
+      message:  'Product Updated Successfully',
+      data:updatedProduct,
     })
-    }catch(error){
-        res.send({
-        status:false,
-        message:"something went wrong",
-        error
-        })  
+  });
 
-    }
-}
-
-const updateProduct= async(req:Request,res:Response)=>{
-    try{
-        const id=req.params.id
-        const body =req.body
-        const result=await productService.updateProduct(id,body)
-
-    res.send({
-        success:true,
-        message:"Product updated successfully",
-        result,
+const deleteABicycle = catchAsync(async (req, res) => {
+ 
+    const { id  } = req.params;
+    const result = await ProductServices.deleteABicycleFromDB(id); 
+    
+    sendResponse.sendDataResponse(res, {
+      statusCode: httpStatus.OK,
+    success: true,
+      message:  'Product deleted successfully',
+      data:{},
     })
-    }catch(error){
-        res.send({
-        status:false,
-        message:"something went wrong",
-        error
-        })  
-
-    }
-}
-
-const deleteProduct= async(req:Request,res:Response)=>{
-    try{
-        const id =req.params.id
-        const result=await productService.deleteProduct(id)
-
-    res.send({
-        success:true,
-        message:"Product deleted successfully",
-        result,
-    })
-    }catch(error){
-        res.send({
-        status:false,
-        message:"something went wrong",
-        error
-        })  
-
-    }
-}
+  });
 
 
-export const productController={
-    createProduct,getProducts,getSingleProduct,updateProduct,deleteProduct
-}
+
+export const ProductControllers = {
+  createABicycle,
+    getAllBicycles,
+    getASpecificBicycle,
+    updateABicycle,
+    deleteABicycle,
+  
+};
