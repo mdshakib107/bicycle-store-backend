@@ -1,0 +1,41 @@
+import { model, Schema } from "mongoose";
+import { TOrder, TOrderedItem } from "./order.interface";
+import { Status } from "./order.constant";
+
+
+const orderedItem = new Schema <TOrderedItem> ({
+    product: {
+        type: Schema.Types.ObjectId,
+        ref: 'Product',
+        required:true
+    },
+    quantity: {
+        type: Number,
+        required:true
+    },
+    price: {
+        type: Number,
+        required:true
+    }
+})
+
+const orderSchema = new Schema <TOrder>({
+    products: [orderedItem],
+    user: {
+        type: Schema.Types.ObjectId,
+        required:true
+    },
+    totalPrice: Number,
+    isDeleted:{
+        type: Boolean,
+        default: false
+    },
+    status:{
+        type: String,
+        required: true,
+        enum: Status
+    }
+})
+
+
+export const Order = model<TOrder>('Order', orderSchema)
