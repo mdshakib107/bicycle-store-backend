@@ -43,9 +43,7 @@ const updateABicycleFromDB = async (
 const getAllBicyclesFromDB = async (query: Record<string, unknown>) => {
   const productQuery = new QueryBuilder(
     Product.find()
-      .populate('user')
-      .populate('admissionSemester')
-      .populate('academicDepartment academicFaculty'),
+      .populate('user'),
     query,
   )
 
