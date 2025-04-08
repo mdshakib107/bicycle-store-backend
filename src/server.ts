@@ -5,10 +5,10 @@ import config from './app/config';
 
 let server: Server;
 
-async function main() { 
+async function main() {
   try {
     await mongoose.connect(config.database_url as string);
-    console.log("Connected to MongoDB Atlas");
+    console.log('Connected to MongoDB Atlas');
 
     server = app.listen(config.port, () => {
       console.log(`app is listening on port ${config.port}`);
