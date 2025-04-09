@@ -10,12 +10,12 @@ import productValidationSchema from './product.validation';
 const router = express.Router();
 
 router.post('/',
-   // auth( USER_ROLE.admin,USER_ROLE.customer),
-  // validateRequest(productValidationSchema),
+    auth( USER_ROLE.admin),
+   validateRequest(productValidationSchema),
  ProductControllers.createABicycle);
 
 router.get('/', 
-    //auth( USER_ROLE.admin,USER_ROLE.customer),
+    auth( USER_ROLE.admin,USER_ROLE.customer),
      ProductControllers. getAllBicycles);
 
 router.get('/:id',
@@ -23,7 +23,7 @@ router.get('/:id',
      ProductControllers.getASpecificBicycle);
 
 router.put('/:id', 
-   // auth(USER_ROLE.admin),
+    auth(USER_ROLE.admin),
      ProductControllers.updateABicycle);
 
 router.delete('/:id', auth(USER_ROLE.admin), ProductControllers. deleteABicycle);

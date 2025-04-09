@@ -1,10 +1,13 @@
 import config from '../../config';
 import { ILoginUser } from './auth.interface';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt , { JwtPayload } from 'jsonwebtoken';
 import { createToken } from './auth.utils';
 import { TUser } from '../user/user.interface';
 import { User } from '../user/user.model';
+import httpStatus from 'http-status';
+import AppError from '../../errors/AppErrors';
+
 
 // register a user
 const register = async (payload: TUser) => {
@@ -34,20 +37,20 @@ const login = async (payload: ILoginUser) => {
     throw new Error('Password does not match');
   }
 
-  if (!config.jwt_secret) {
+  if (!config.jwt_access_secret) {
     throw new Error('JWT secret is not defined');
   }
 
   const token = createToken(
     { email: user?.email, role: user?.role },
-    config.jwt_secret as string,
-    config.jwt_access_expiration as string,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
   );
 
   const refreshToken = createToken(
     { email: user?.email, role: user?.role },
-    config.jwt_secret as string,
-    config.jwt_refresh_expiration as string,
+    config.jwt_access_secret as string,
+    config.jwt_refresh_expires_in as string,
   );
 
   // exclude the password field from the response
@@ -64,11 +67,11 @@ const login = async (payload: ILoginUser) => {
 
 // refresh token
 const refreshToken = async (refreshToken: string) => {
-  if (!config.jwt_secret) {
+  if (!config.jwt_access_secret) {
     throw new Error('Unauthorized user');
   }
 
-  const decode = jwt.verify(refreshToken, config.jwt_secret) as { email: string; role: string };
+  const decode = jwt.verify(refreshToken, config.jwt_access_secret) as { email: string; role: string };
 
   const user = await User.findOne({ email: decode.email });
 
@@ -82,8 +85,8 @@ const refreshToken = async (refreshToken: string) => {
 
   const token = createToken(
     { email: user.email, role: user.role },
-    config.jwt_secret as string,
-    config.jwt_access_expiration as string,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
   );
 
   const result = {
@@ -94,8 +97,52 @@ const refreshToken = async (refreshToken: string) => {
   return result;
 };
 
+//change password
+
+const changePassword = async (
+  userData: JwtPayload,
+  payload: { oldPassword: string; newPassword: string },
+) => {
+  const user = await User.findOne({email: userData.email }).select('+password');
+if (!user) {
+  throw new AppError(httpStatus.NOT_FOUND, 'This user is not found!');
+}
+
+const userStatus = user?.status;
+
+if (userStatus === 'deactivate') {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked!');
+  }
+
+ const isOldPasswordCorrect = await bcrypt.compare(payload.oldPassword, user.password);
+ if (!isOldPasswordCorrect) {
+   throw new AppError(httpStatus.FORBIDDEN, 'The old password is incorrect');
+ }
+
+ const newHashedPassword = await bcrypt.hash(
+   payload.newPassword,
+   Number(config.bcrypt_salt_rounds),
+ );
+
+ await User.findByIdAndUpdate(
+   userData.email, 
+   {
+     password: newHashedPassword,
+     passwordChangedAt: new Date(), 
+   },
+ );
+ const jwtPayload = {
+  email: user?.email,
+  role: user?.role,
+}
+ //return null; 
+ const token = jwt.sign(jwtPayload, "secret", { expiresIn: '1d' });
+
+  return {token, user};
+}
 export const authService = {
   register,
   login,
   refreshToken,
+  changePassword
 };
