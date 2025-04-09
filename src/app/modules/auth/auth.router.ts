@@ -1,10 +1,10 @@
 import { Router } from 'express';
+import auth from '../../middlewares/auth';
+import validateRequest from '../../middlewares/validateRequest';
+import { UserValidation } from '../user/user.validation';
+import { USER_ROLE } from './../user/user.constant';
 import { authController } from './auth.controller';
 import { authValidation } from './auth.validation';
-import validateRequest from 'src/app/middlewares/validateRequest';
-import { UserValidation } from '../user/user.validation';
-import auth from '../../middlewares/auth';
-import { USER_ROLE } from './../user/user.constant';
 
 const authRouter = Router();
 
