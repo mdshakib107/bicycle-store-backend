@@ -5,7 +5,7 @@ import validateRequest from '../../middlewares/validateRequest';
 import { upload } from '../../utils/sendImageToCloudinary';
 import { USER_ROLE } from './user.constant';
 import { UserControllers } from './user.controller';
-import { UserValidation } from './user.validation';
+import { userValidations } from './user.validation';
 //import {userValidationSchema} from "./user.validation"
 const router = express.Router();
 
@@ -18,7 +18,7 @@ router.post(
   req.body = JSON.parse(req.body.data);
    next();
   },
-  validateRequest(UserValidation.userValidationSchema),
+  validateRequest(userValidations.userValidationSchema),
   UserControllers.createUser,
 
 );
