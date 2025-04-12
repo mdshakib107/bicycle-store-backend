@@ -6,6 +6,7 @@ import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/notFound';
+import HttpStatus from 'http-status';
 import router from './app/routes';
 
 const app: Application = express();
@@ -33,6 +34,16 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use(globalErrorHandler);
 
+// route not found
+app.use('*', (req: Request, res: Response) => {
+    res.status(HttpStatus.FORBIDDEN).send({
+      success: false,
+      message: 'Route not found!',
+      status: HttpStatus.FORBIDDEN,
+    });
+  });
+
+// api not found
 app.use(notFound as any);
 
 export default app;
