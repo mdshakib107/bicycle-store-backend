@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { authService } from './auth.service';
 import HttpStatus from 'http-status';
 import config from '../../config';
-import catchAsync from 'src/app/utils/catchAsync';
-import { sendResponse } from 'src/app/utils/sendResponse';
+import catchAsync from '../../utils/catchAsync';
+import { sendResponse } from '../../utils/sendResponse';
+import { authService } from './auth.service';
 
 // register a user
 const register = catchAsync(async (req: Request, res: Response) => {
@@ -21,7 +21,7 @@ const register = catchAsync(async (req: Request, res: Response) => {
 const login = catchAsync(async (req: Request, res: Response) => {
   const result = await authService.login(req.body);
 
-  const {refreshToken} = result;
+  const { refreshToken } = result;
 
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
@@ -40,12 +40,10 @@ const login = catchAsync(async (req: Request, res: Response) => {
 
 // refresh token
 const refreshToken = catchAsync(async (req: Request, res: Response) => {
+  const { refreshToken } = req.cookies;
 
-  const {refreshToken} = req.cookies;
-  
   const result = await authService.refreshToken(refreshToken);
 
-  
   sendResponse.sendDataResponse(res, {
     success: true,
     message: 'Token refreshed successfully',
@@ -55,8 +53,25 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const changePassword = catchAsync(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  const result = await authService.changePassword(req.user, {
+    oldPassword,
+    newPassword,
+  });
+
+  sendResponse.sendUpdateResponse(res, {
+    statusCode: HttpStatus.OK,
+    success: true,
+    message: 'Password is updated succesfully!',
+    data: result,
+  });
+});
+
 export const authController = {
   register,
   login,
   refreshToken,
+  changePassword,
 };

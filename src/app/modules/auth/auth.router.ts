@@ -1,14 +1,16 @@
 import { Router } from 'express';
+import auth from '../../middlewares/auth';
+import validateRequest from '../../middlewares/validateRequest';
+import { userValidations } from '../user/user.validation';
+import { USER_ROLE } from './../user/user.constant';
 import { authController } from './auth.controller';
 import { authValidation } from './auth.validation';
-import validateRequest from 'src/app/middlewares/validateRequest';
-import { UserValidation } from '../user/user.validation';
 
 const authRouter = Router();
 
 authRouter.post(
   '/register',
-  validateRequest(UserValidation.userValidationSchema),
+  validateRequest(userValidations.userValidationSchema),
   authController.register,
 );
 authRouter.post(
@@ -20,6 +22,13 @@ authRouter.post(
   '/refreshToken',
   validateRequest(authValidation.refreshTokenValidationSchema),
   authController.refreshToken,
+);
+
+authRouter.put(
+  '/change-password',
+  auth(USER_ROLE.admin, USER_ROLE.customer),
+  validateRequest(authValidation.changePasswordValidationSchema),
+  authController.changePassword,
 );
 
 export default authRouter;

@@ -4,39 +4,64 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
 import { User } from '../modules/user/user.model';
 import catchAsync from '../utils/catchAsync';
+import { TUserRole } from '../modules/user/user.interface';
+import AppError from '../errors/AppErrors';
 
-const auth = (...requiredRole: string[]) => {
+const auth = (...requiredRoles:TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     
-    const token = req.headers.authorization;
-    const secret = config.jwt_secret;
+   const token = req.headers.authorization?.split(' ')[1];
+    const secret = config.jwt_access_secret;
+    
+    
+    if (!token) {
+        throw new AppError(HttpStatus.UNAUTHORIZED, 'You are not authorized!');
+      }
+  
+    let decode:any;
+    try{
+       decode = jwt.verify(
+        token,
+        config.jwt_access_secret as string,
+      ) as JwtPayload;
+  }
+  catch(err){
+    throw new AppError(HttpStatus.UNAUTHORIZED, 'UNAUTHORIZED');
+  }
+console.log(decode);
 
-    if (!token || !secret) {
-      res.status(!token ? HttpStatus.UNAUTHORIZED : HttpStatus.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: !token ? 'No token provided' : 'JWT secret is not defined',
-      });
-    }
-
-    const decode = jwt.verify(token!, secret! ) as JwtPayload;
-
-    const { email, role } = decode as { email: string, role: string };
-
-    const user = await User.findOne({ email });
+    const { role, email, userId, iat} = decode;
+    const user = await User.findOne({ email }).select('status role'); 
 
     if (!user) {
-      res.status(HttpStatus.UNAUTHORIZED).json({
-        success: false,
-        message: 'User not found',
-      });
-    }
+        throw new AppError(HttpStatus.NOT_FOUND, 'This user is not found !');
+      }
+    
 
-    if(requiredRole && !requiredRole.includes(role)) {
-      res.status(HttpStatus.UNAUTHORIZED).json({
-        success: false,
-        message: 'Unauthorized user',
-      });
-    }
+    const userStatus = user?.status;
+
+    if (userStatus === 'deactivate') {
+        throw new AppError(HttpStatus.FORBIDDEN, 'This user is blocked!');
+      }
+      
+
+    if (
+        user.passwordChangedAt &&
+        User.isJWTIssuedBeforePasswordChanged(
+          user.passwordChangedAt,
+          iat as number,
+        )
+      ) {
+        throw new AppError(HttpStatus.UNAUTHORIZED, 'You are not authorized !');
+      }
+
+
+    if (requiredRoles && !requiredRoles.includes(role)) {
+        throw new AppError(
+            HttpStatus.UNAUTHORIZED,
+          'You are not authorized  hi!',
+        );
+      }
 
     req.user = decode as JwtPayload;
 

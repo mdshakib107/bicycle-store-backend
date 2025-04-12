@@ -1,4 +1,3 @@
-import app from 'src/app';
 import { UserServices } from '../user/user.service';
 import { TOrder } from './order.interface';
 import { Order } from './order.model';

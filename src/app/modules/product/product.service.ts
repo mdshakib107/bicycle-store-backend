@@ -2,16 +2,14 @@ import { TProduct } from './product.interface';
 import { Product } from './product.model';
 import { productSearchableFields } from './product.constant';
 import QueryBuilder from '../../builder/QueryBuilder'
+
 const createABicycleIntoDB = async ( productData: TProduct) => {
-  //const productData: Partial<TProduct> = {};
 
   const productExists = await Product.findOne({ _id: productData._id }); 
   if (productExists) {
     throw new Error('Product with this ID already exists!');
   };
   
-
-
   const result = await Product.create(productData); 
   return result;
 };
@@ -43,9 +41,7 @@ const updateABicycleFromDB = async (
 const getAllBicyclesFromDB = async (query: Record<string, unknown>) => {
   const productQuery = new QueryBuilder(
     Product.find()
-      .populate('user')
-      .populate('admissionSemester')
-      .populate('academicDepartment academicFaculty'),
+      .populate('user'),
     query,
   )
 

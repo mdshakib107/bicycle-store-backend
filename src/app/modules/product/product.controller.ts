@@ -39,17 +39,6 @@ const createABicycle = catchAsync(async (req, res) =>  {
 const getAllBicycles =  catchAsync(async (req, res) => {
   
     const result = await ProductServices.getAllBicyclesFromDB(req.query);
-   // const { searchTerm } = req.query;
- //const filter: any = {};
-    //if (searchTerm) {
-    //  const regex = new RegExp(searchTerm as string, 'i'); 
-     // filter.$or = [
-      //  { name: regex },
-     // { type: regex },
-     // ];
-    //}
-
-   // const bicycles = await Product.find(filter);
     sendResponse.sendDataResponse(res, {
       statusCode: httpStatus.OK,
     success: true,
