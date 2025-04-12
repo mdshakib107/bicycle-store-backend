@@ -15,11 +15,10 @@ router.post('/',
  ProductControllers.createABicycle);
 
 router.get('/', 
-    auth( USER_ROLE.admin,USER_ROLE.customer),
-     ProductControllers. getAllBicycles);
+    //auth( USER_ROLE.admin,USER_ROLE.customer),
+     ProductControllers. getAllBicycles); 
 
 router.get('/:id',
-    auth( USER_ROLE.admin,USER_ROLE.customer), 
      ProductControllers.getASpecificBicycle);
 
 router.put('/:id', 
