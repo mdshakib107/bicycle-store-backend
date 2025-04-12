@@ -16,10 +16,9 @@ router.post('/',
 
 router.get('/', 
     //auth( USER_ROLE.admin,USER_ROLE.customer),
-     ProductControllers. getAllBicycles);
+     ProductControllers. getAllBicycles); 
 
 router.get('/:id',
-    auth( USER_ROLE.admin,USER_ROLE.customer), 
      ProductControllers.getASpecificBicycle);
 
 router.put('/:id', 
