@@ -2,17 +2,17 @@ import { z } from 'zod';
 
 const loginValidationSchema = z.object({
   body: z.object({
-  email: z
-    .string({
-      required_error: 'Please provide an email address',
-    })
-    .email(),
-  password: z
-    .string({
-      required_error: 'Please provide a password',
-    })
-    .min(4)
-    .max(20),
+    email: z
+      .string({
+        required_error: 'Please provide an email address',
+      })
+      .email(),
+    password: z
+      .string({
+        required_error: 'Please provide a password',
+      })
+      .min(4)
+      .max(20),
   }),
 });
 
@@ -35,11 +35,8 @@ const changePasswordValidationSchema = z.object({
   }),
 });
 
-
-
 export const authValidation = {
   loginValidationSchema,
   refreshTokenValidationSchema,
- changePasswordValidationSchema ,
-
+  changePasswordValidationSchema,
 };

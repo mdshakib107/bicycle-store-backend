@@ -43,6 +43,10 @@ export const userSchema = new Schema<TUser,UserModel>(
       default: 'active',
     },
   },
+  {
+    timestamps: true,
+    versionKey: false,
+  },
 );
 userSchema.pre('save', async function (next) {
   const user = this; 
