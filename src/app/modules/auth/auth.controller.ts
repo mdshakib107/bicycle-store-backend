@@ -21,7 +21,7 @@ const register = catchAsync(async (req: Request, res: Response) => {
 const login = catchAsync(async (req: Request, res: Response) => {
   const result = await authService.login(req.body);
 
-  const { refreshToken } = result;
+  const { refreshToken, token } = result;
 
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
@@ -31,9 +31,9 @@ const login = catchAsync(async (req: Request, res: Response) => {
 
   sendResponse.sendDataResponse(res, {
     success: true,
-    message: 'User registered successfully',
+    message: 'User login successful',
     statusCode: HttpStatus.CREATED,
-    token: result.token!,
+    token: result.token! || token!,
     data: result.user,
   });
 });

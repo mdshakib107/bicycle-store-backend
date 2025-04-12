@@ -41,13 +41,13 @@ const login = async (payload: ILoginUser) => {
     throw new Error('JWT secret is not defined');
   }
 
-  const token = createToken(
+  const token = await createToken(
     { email: user?.email, role: user?.role },
     config.jwt_access_secret as string,
     config.jwt_access_expires_in as string,
   );
 
-  const refreshToken = createToken(
+  const refreshToken = await createToken(
     { email: user?.email, role: user?.role },
     config.jwt_access_secret as string,
     config.jwt_refresh_expires_in as string,

@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
+import { USER_ROLE } from '../user/user.constant';
 import { userValidations } from '../user/user.validation';
-import { USER_ROLE } from './../user/user.constant';
 import { authController } from './auth.controller';
 import { authValidation } from './auth.validation';
 
