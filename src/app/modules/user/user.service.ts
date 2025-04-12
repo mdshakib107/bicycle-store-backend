@@ -1,6 +1,5 @@
 import httpStatus from 'http-status';
 import AppError from '../../errors/AppErrors';
-//import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 import { TUser } from './user.interface';
 import { User } from './user.model';
 
