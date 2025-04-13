@@ -46,7 +46,7 @@ const login = async (payload: ILoginUser) => {
     config.jwt_access_secret as string,
     config.jwt_access_expires_in as string,
   );
-
+   
   const refreshToken = createToken(
     { email: user?.email, role: user?.role },
     config.jwt_access_secret as string,
