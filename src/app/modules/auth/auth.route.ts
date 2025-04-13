@@ -1,19 +1,16 @@
 import { Router } from 'express';
 import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
-import { UserValidation } from '../user/user.validation';
-import { USER_ROLE } from './../user/user.constant';
+import { USER_ROLE } from '../user/user.constant';
+import { userValidations } from '../user/user.validation';
 import { authController } from './auth.controller';
 import { authValidation } from './auth.validation';
-
-
-
 
 const authRouter = Router();
 
 authRouter.post(
   '/register',
-  validateRequest(UserValidation.userValidationSchema),
+  validateRequest(userValidations.userValidationSchema),
   authController.register,
 );
 authRouter.post(

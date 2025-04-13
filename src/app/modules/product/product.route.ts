@@ -9,25 +9,23 @@ import productValidationSchema from './product.validation';
 
 const router = express.Router();
 
-router.post('/',
-    auth( USER_ROLE.admin),
-   validateRequest(productValidationSchema),
- ProductControllers.createABicycle);
+router.post(
+  '/',
+  auth(USER_ROLE.admin),
+  validateRequest(productValidationSchema),
+  ProductControllers.createABicycle,
+);
 
-router.get('/', 
-    auth( USER_ROLE.admin,USER_ROLE.customer),
-     ProductControllers. getAllBicycles);
+router.get(
+  '/',
+  //auth( USER_ROLE.admin,USER_ROLE.customer),
+  ProductControllers.getAllBicycles,
+);
 
-router.get('/:id',
-    auth( USER_ROLE.admin,USER_ROLE.customer), 
-     ProductControllers.getASpecificBicycle);
+router.get('/:id', ProductControllers.getASpecificBicycle);
 
-router.put('/:id', 
-    auth(USER_ROLE.admin),
-     ProductControllers.updateABicycle);
+router.put('/:id', auth(USER_ROLE.admin), ProductControllers.updateABicycle);
 
-router.delete('/:id', auth(USER_ROLE.admin), ProductControllers. deleteABicycle);
-
-
+router.delete('/:id', auth(USER_ROLE.admin), ProductControllers.deleteABicycle);
 
 export const ProductRoutes = router;

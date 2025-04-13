@@ -10,4 +10,7 @@ router.get('/', OrderControllers.getAllOrder)
 router.patch('/:id', OrderControllers.updateSingleOrder)
 router.delete('/:id', OrderControllers.deleteSingleOrder)
 
-export const orderRoutes = router
+router.post('/success/:transactionId',OrderControllers.successOrder)
+router.post('/fail/:transactionId', OrderControllers.failOrder)
+
+export const orderRoutes = router   
