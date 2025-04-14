@@ -1,24 +1,22 @@
+import QueryBuilder from '../../builder/QueryBuilder';
+import { productSearchableFields } from './product.constant';
 import { TProduct } from './product.interface';
 import { Product } from './product.model';
-import { productSearchableFields } from './product.constant';
-import QueryBuilder from '../../builder/QueryBuilder'
 
-const createABicycleIntoDB = async ( productData: TProduct) => {
-
-  const productExists = await Product.findOne({ _id: productData._id }); 
+const createABicycleIntoDB = async (productData: TProduct) => {
+  const productExists = await Product.findOne({ _id: productData._id });
   if (productExists) {
     throw new Error('Product with this ID already exists!');
-  };
-  
-  const result = await Product.create(productData); 
+  }
+
+  const result = await Product.create(productData);
   return result;
 };
 
 const updateABicycleFromDB = async (
   id: string,
-  updatedProductData: Partial<{ price: number; quantity: number}>
+  updatedProductData: Partial<{ price: number; quantity: number }>,
 ) => {
-
   const product = await Product.findById(id);
   if (!product) {
     throw new Error('Product not found');
@@ -34,46 +32,38 @@ const updateABicycleFromDB = async (
 
   await product.save();
 
-  return product; 
+  return product;
 };
 
-
 const getAllBicyclesFromDB = async (query: Record<string, unknown>) => {
-  const productQuery = new QueryBuilder(
-    Product.find()
-      .populate('user'),
-    query,
-  )
+  const productQuery = new QueryBuilder(Product.find(), query)
 
     .search(productSearchableFields)
     .filter()
     .sort()
     .paginate()
     .fields();
-    const meta = await productQuery.countTotal();
-  const result = await Product.find(); 
-  return {meta,result};
+  const meta = await productQuery.countTotal();
+  const result = await productQuery.modelQuery;
+  return { meta, result };
 };
 
 const getASpecificBicycleFromDB = async (id: string) => {
-  const result = await Product.findById(id); 
+  const result = await Product.findById(id);
   if (!result) {
     throw new Error('Product not found!');
   }
   return result;
 };
-
 
 const deleteABicycleFromDB = async (id: string) => {
-  const result = await Product.findByIdAndDelete(id)
-    
+  const result = await Product.findByIdAndDelete(id);
+
   if (!result) {
     throw new Error('Product not found!');
   }
   return result;
 };
-
-
 
 const updateProductInventory = async (productId: string, quantity: number) => {
   const product = await Product.findById(productId);
@@ -81,22 +71,19 @@ const updateProductInventory = async (productId: string, quantity: number) => {
     throw new Error('Product not found');
   }
 
-  
-if (product.quantity < quantity) {
-  throw new Error('Insufficient stock available');
-}
-product.quantity -= quantity;
-  
-  if (product.quantity === 0) {
-    product.inStock = false; 
+  if (product.quantity < quantity) {
+    throw new Error('Insufficient stock available');
   }
+  product.quantity -= quantity;
 
+  if (product.quantity === 0) {
+    product.inStock = false;
+  }
 
   await product.save();
 
   return product;
 };
-
 
 export const ProductServices = {
   createABicycleIntoDB,
