@@ -8,7 +8,7 @@ import { Types } from 'mongoose';
     Img?: string;
     brand: string;
     price: number;
-    type: "Mountain" | "Road" | "Hybrid" | "BMX" | "Electric" ;
+    type: "Mountain" | "Road" | "Hybrid" | "BMX" | "Electric" | "Fat Bikes" ;
     description: string;
     quantity: number;
     inStock: boolean;
