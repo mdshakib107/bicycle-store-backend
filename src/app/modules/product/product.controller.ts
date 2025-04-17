@@ -9,20 +9,13 @@ import catchAsync from '../../utils/catchAsync';
 //import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 const createABicycle = catchAsync(async (req, res) => {
-  const { name, Img, brand, price, type, description, quantity, inStock } =
-    req.body;
-  const validatedData = productValidationSchema.parse({
-    name,
-    Img,
-    brand,
-    price,
-    type,
-    description,
-    quantity,
-    inStock,
-  });
+  // validate the shape { body: {...actualData} }
+  const validated = productValidationSchema.parse({ body: req.body });
 
-  const newProduct = new Product(validatedData);
+  // get the actual validated product data
+  const productData = validated.body;
+
+  const newProduct = new Product(productData);
   const result = await newProduct.save();
 
   sendResponse.sendCreateDataResponse(res, {

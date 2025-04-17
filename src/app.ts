@@ -1,5 +1,4 @@
-//node dist/server.js
-// npm run start:dev
+
 
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -10,7 +9,8 @@ import HttpStatus from 'http-status';
 import router from './app/routes';
 
 const app: Application = express();
-app.use(express.json());
+app.use(express.json()); // parses application/json
+app.use(express.urlencoded({ extended: true })); // parses form data
 app.use(cookieParser());
 app.use(cors({ origin: 'http://localhost:5173', credentials: true })); // *
 

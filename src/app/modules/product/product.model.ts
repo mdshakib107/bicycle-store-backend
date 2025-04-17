@@ -26,7 +26,7 @@ const productSchema = new Schema<TProduct>(
     Img: { type: String, default: '' },
     type: {
       type: String,
-      enum: ['Mountain', 'Road', 'Hybrid', 'BMX', 'Electric'],
+      enum: ['Mountain', 'Road', 'Hybrid', 'BMX', 'Electric', 'Fat Bikes'],
       required: [true, 'Bicycle type is required'],
     },
     description: { type: String, required: [true, 'Description is required'] },

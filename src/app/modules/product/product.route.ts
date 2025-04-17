@@ -13,6 +13,7 @@ router.post(
   '/',
   auth(USER_ROLE.admin),
   validateRequest(productValidationSchema),
+  // (req, res)=> console.log(req.body),
   ProductControllers.createABicycle,
 );
 
