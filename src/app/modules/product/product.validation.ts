@@ -14,7 +14,7 @@ const productBodySchema = z.object({
     'Fat Bikes',
   ]),
   description: z.string().min(1, 'Description is required'),
-  quantity: z.number().min(1, 'Quantity must be at least 1'),
+  quantity: z.number().min(0, 'Quantity must be at least 0'),
   inStock: z.boolean(),
 });
 
