@@ -25,7 +25,7 @@ router.post(
 
 router.get(
   '/:userId',
-   auth(USER_ROLE.admin),
+  //  auth(USER_ROLE.admin),
   UserControllers.getSingleUser,);
 
   router.put(
