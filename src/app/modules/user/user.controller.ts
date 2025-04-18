@@ -4,10 +4,10 @@ import catchAsync from '../../utils/catchAsync';
 import { UserServices } from './user.service';
 
 
-const createUser = catchAsync(async (req, res) => {
+const createAdmin = catchAsync(async (req, res) => {
   
     const payload = req.body
- const result = await UserServices.createUser(payload)
+ const result = await UserServices.createAdmin(payload)
 
  sendResponse.sendCreateDataResponse(res, {
       statusCode: httpStatus.OK,
@@ -70,7 +70,7 @@ const createUser = catchAsync(async (req, res) => {
   
 
  export const UserControllers = {
-  createUser,
+  createAdmin,
   getAllUser,
   getSingleUser,
   updateUser,
