@@ -1,7 +1,7 @@
 import { Types } from "mongoose"
 
 
-export type TStatus = 'PENDING' | 'PROCESSING' | 'ON THE WAY' | 'DELIVERED' | 'CANCELED'
+export type TStatus = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELED'
 export type TPaymentStatus = 'UNPAID' | 'PAID' 
 
 export type TOrderedItem = {
@@ -16,6 +16,6 @@ export type TOrder = {
     totalPrice: number,
     isDeleted?: boolean,
     status: TStatus,
-    transactionId?: string,
+    transactionId?: string, 
     paymentStatus: TPaymentStatus
 }

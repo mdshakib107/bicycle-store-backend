@@ -39,7 +39,6 @@ const failOrder = catchAsync(async (req, res)=> {
   return res.redirect(`${config.frontendBaseUrl}/orders/failed`)
 })
 
-
 const getAllOrder = catchAsync(async (req, res) => {
   const result = await OrderService.getAllOrdersFromDB(req.query);
   sendResponse.sendCreateDataResponse(res, {

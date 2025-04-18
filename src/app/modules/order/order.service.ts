@@ -5,75 +5,103 @@ import SSLCommerzPayment from 'sslcommerz-lts';
 import { v4 as uuidv4 } from 'uuid';
 import AppError from '../../errors/AppErrors';
 import httpStatus from 'http-status'
+import { Product } from '../product/product.model';
+import mongoose from 'mongoose';
 
 
 const createOrderIntoDB = async (payload: TOrder) => {
-
-  const user_id = payload.user.toString()
-  const DBuser = await UserServices.getSingleUser(user_id)
-  const transactionId = `${uuidv4()}-${Date.now()}`
+  console.log(payload);
+  const session = await mongoose.startSession();
 
 
-  const data = {
-    total_amount: payload.totalPrice,
-    currency: 'BDT',
-    tran_id: transactionId,
-    success_url: `${process.env.API_BASE_URL}/api/orders/success/${transactionId}`,
-    fail_url: `${process.env.API_BASE_URL}/api/orders/fail/${transactionId}`,
-    cancel_url: `${process.env.API_BASE_URL}/api/orders/cancel/${transactionId}`,
-    shipping_method: 'NO',
-    product_name: 'Bicycle',
-    product_category: 'Physical Goods',
-    product_profile: 'general',
-    cus_name: DBuser?.name,
-    cus_email: DBuser?.email,
-    cus_add1: 'Dhaka',
-    cus_add2: 'Bangladesh',
-    cus_city: 'Dhaka',
-    cus_state: 'Dhaka',
-    cus_postcode: '1000',
-    cus_country: 'Bangladesh',
-    cus_phone: '01711111111',
-    cus_fax: '01711111111',
-    ship_name: 'Customer Name',
-    ship_add1: 'Dhaka',
-    ship_add2: 'Bangladesh',
-    ship_city: 'Dhaka',
-    ship_state: 'Dhaka',
-    ship_postcode: '1000',
-    ship_country: 'Bangladesh',
-    value_a: 'ref001',
-    value_b: 'ref002',
-    value_c: 'ref003',
-    value_d: 'ref004'
-  };
+  try {
+    session.startTransaction();
+    const user_id = payload.user.toString();
+    const productId = payload.products[0].product;
+    const orderQuantity = payload.products[0].quantity;
 
+    const DBuser = await UserServices.getSingleUser(user_id);
+    const transactionId = `${uuidv4()}-${Date.now()}`;
 
+    const product = await Product.findById(productId);
 
+    if (!product) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+    }
 
-  const sslcz = new SSLCommerzPayment(
-    process.env.STORE_ID!,
-    process.env.STORE_PASS!,
-    process.env.IS_LIVE === "true"
-  )
+    if (product.quantity === 0) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Product is out of stock');
+    }
 
+    if (product.quantity < orderQuantity) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Not enough stock available');
+    }
 
-  const apiResponse = await sslcz.init(data)
-  const GatewayPageURL = apiResponse.GatewayPageURL
+    const data = {
+      total_amount: payload.totalPrice,
+      currency: 'BDT',
+      tran_id: transactionId,
+      success_url: `${process.env.API_BASE_URL}/api/orders/success/${transactionId}`,
+      fail_url: `${process.env.API_BASE_URL}/api/orders/fail/${transactionId}`,
+      cancel_url: `${process.env.API_BASE_URL}/api/orders/cancel/${transactionId}`,
+      shipping_method: 'NO',
+      product_name: product.name,
+      product_category: 'Physical Goods',
+      product_profile: 'general',
+      cus_name: DBuser?.name,
+      cus_email: DBuser?.email,
+      cus_add1: 'Dhaka',
+      cus_add2: 'Bangladesh',
+      cus_city: 'Dhaka',
+      cus_state: 'Dhaka',
+      cus_postcode: '1000',
+      cus_country: 'Bangladesh',
+      cus_phone: '01711111111',
+      cus_fax: '01711111111',
+      ship_name: 'Customer Name',
+      ship_add1: 'Dhaka',
+      ship_add2: 'Bangladesh',
+      ship_city: 'Dhaka',
+      ship_state: 'Dhaka',
+      ship_postcode: '1000',
+      ship_country: 'Bangladesh',
+      value_a: 'ref001',
+      value_b: 'ref002',
+      value_c: 'ref003',
+      value_d: 'ref004'
+    };
 
-  const orderData = { ...payload, transactionId }
+    const sslcz = new SSLCommerzPayment(
+      process.env.STORE_ID!,
+      process.env.STORE_PASS!,
+      process.env.IS_LIVE === "true"
+    );
 
+    const apiResponse = await sslcz.init(data);
+    const GatewayPageURL = apiResponse.GatewayPageURL;
 
+    const orderData = { ...payload, transactionId };
+    const createdOrder = await Order.create([orderData], { session });
 
-  const createOrder = await Order.create(orderData);
+    await Product.findByIdAndUpdate(
+      productId,
+      { $inc: { quantity: -orderQuantity } },
+      { session }
+    );
 
-  return {
-    GatewayPageURL,
-    order: createOrder
+    await session.commitTransaction();
+    session.endSession();
+
+    return {
+      GatewayPageURL,
+      order: createdOrder[0]
+    };
+
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error; 
   }
-
-
-
 };
 
 const successOrderIntoDB = async (transactionId: string) => {
@@ -125,11 +153,16 @@ const getAllOrdersFromDB = async (query: Record<string, unknown>) => {
   const userId = query.id as string
 
   // filter object
-  const filter : Record<string, unknown> = {};
+  const filter: Record<string, unknown> = {
+    isDeleted: { $ne: true }
+  };
   if (userId) {
     filter.user = userId
   }
   // console.log(filter);
+  // exclude the deleted orders
+
+
 
   const result = await Order.find(filter)
     .populate('user')
@@ -139,7 +172,7 @@ const getAllOrdersFromDB = async (query: Record<string, unknown>) => {
 
   const totalOrders = await Order.countDocuments(filter);
   return {
-    data: result, 
+    data: result,
     totalOrders,
     totalPages: Math.ceil(totalOrders / limit),
     currentPage: page,
