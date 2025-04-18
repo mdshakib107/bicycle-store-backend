@@ -19,7 +19,7 @@ router.post(
    next();
   },
   validateRequest(userValidations.userValidationSchema),
-  UserControllers.createUser,
+  UserControllers.createAdmin,
 
 );
 
