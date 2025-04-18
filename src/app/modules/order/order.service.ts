@@ -7,12 +7,6 @@ import AppError from '../../errors/AppErrors';
 import httpStatus from 'http-status'
 
 
-const ssl = {
-  STORE_ID: 'erger67f7cdd256d33',
-  STORE_PASS: 'erger67f7cdd256d33@ssl',
-  is_live: false
-} 
-
 const createOrderIntoDB = async (payload: TOrder) => {
 
   const user_id = payload.user.toString()
@@ -58,9 +52,9 @@ const createOrderIntoDB = async (payload: TOrder) => {
 
 
   const sslcz = new SSLCommerzPayment(
-    ssl.STORE_ID,
-    ssl.STORE_PASS,
-    ssl.is_live
+    process.env.STORE_ID!,
+    process.env.STORE_PASS!,
+    process.env.IS_LIVE === "true"
   )
 
 
@@ -128,16 +122,24 @@ const getAllOrdersFromDB = async (query: Record<string, unknown>) => {
   let page = Number(query.page) || 1; // Default to page 1 if not provided
   let limit = Number(query.limit) || 10; // Default to 10 items per page if not provided
   const skip = (page - 1) * limit;
+  const userId = query.id as string
 
-  const result = await Order.find()
+  // filter object
+  const filter : Record<string, unknown> = {};
+  if (userId) {
+    filter.user = userId
+  }
+  // console.log(filter);
+
+  const result = await Order.find(filter)
     .populate('user')
     .populate('products.product')
     .skip(skip)
     .limit(limit);
 
-  const totalOrders = await Order.countDocuments();
+  const totalOrders = await Order.countDocuments(filter);
   return {
-    data: result,
+    data: result, 
     totalOrders,
     totalPages: Math.ceil(totalOrders / limit),
     currentPage: page,
