@@ -1,13 +1,12 @@
-import config from '../../config';
-import { ILoginUser } from './auth.interface';
 import bcrypt from 'bcrypt';
-import jwt , { JwtPayload } from 'jsonwebtoken';
-import { createToken } from './auth.utils';
+import httpStatus from 'http-status';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import config from '../../config';
+import AppError from '../../errors/AppErrors';
 import { TUser } from '../user/user.interface';
 import { User } from '../user/user.model';
-import httpStatus from 'http-status';
-import AppError from '../../errors/AppErrors';
-
+import { ILoginUser } from './auth.interface';
+import { createToken } from './auth.utils';
 
 // register a user
 const register = async (payload: TUser) => {
@@ -26,7 +25,7 @@ const login = async (payload: ILoginUser) => {
   }
 
   const userStatus = user?.status;
-  if (userStatus === "deactivate") {
+  if (userStatus === 'deactivate') {
     throw new Error('User is blocked');
   }
 
@@ -71,7 +70,10 @@ const refreshToken = async (refreshToken: string) => {
     throw new Error('Unauthorized user');
   }
 
-  const decode = jwt.verify(refreshToken, config.jwt_access_secret) as { email: string; role: string };
+  const decode = jwt.verify(refreshToken, config.jwt_access_secret) as {
+    email: string;
+    role: string;
+  };
 
   const user = await User.findOne({ email: decode.email });
 
@@ -79,7 +81,7 @@ const refreshToken = async (refreshToken: string) => {
     throw new Error('User not found');
   }
 
-  if (user?.status === "deactivate") {
+  if (user?.status === 'deactivate') {
     throw new Error('User is blocked');
   }
 
@@ -103,46 +105,55 @@ const changePassword = async (
   userData: JwtPayload,
   payload: { oldPassword: string; newPassword: string },
 ) => {
-  const user = await User.findOne({email: userData.email }).select('+password');
-if (!user) {
-  throw new AppError(httpStatus.NOT_FOUND, 'This user is not found!');
-}
+  const user = await User.findOne({ email: userData.email }).select(
+    '+password',
+  );
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This user is not found!');
+  }
 
-const userStatus = user?.status;
+  const userStatus = user?.status;
 
-if (userStatus === 'deactivate') {
+  if (userStatus === 'deactivate') {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked!');
   }
 
- const isOldPasswordCorrect = await bcrypt.compare(payload.oldPassword, user.password);
- if (!isOldPasswordCorrect) {
-   throw new AppError(httpStatus.FORBIDDEN, 'The old password is incorrect');
- }
+  const isOldPasswordCorrect = await bcrypt.compare(
+    payload.oldPassword,
+    user.password,
+  );
+  if (!isOldPasswordCorrect) {
+    throw new AppError(httpStatus.FORBIDDEN, 'The old password is incorrect');
+  }
 
- const newHashedPassword = await bcrypt.hash(
-   payload.newPassword,
-   Number(config.bcrypt_salt_rounds),
- );
+  const newHashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt_rounds),
+  );
+  await User.findOneAndUpdate(
+    { email: userData.email },
+    {
+      password: newHashedPassword,
+      passwordChangedAt: new Date(),
+    },
+  );
+  await User.findByIdAndUpdate(userData.email, {
+    password: newHashedPassword,
+    passwordChangedAt: new Date(),
+  });
+  const jwtPayload = {
+    email: user?.email,
+    role: user?.role,
+  };
+  //return null;
+  const token = jwt.sign(jwtPayload, 'secret', { expiresIn: '1d' });
 
- await User.findByIdAndUpdate(
-   userData.email, 
-   {
-     password: newHashedPassword,
-     passwordChangedAt: new Date(), 
-   },
- );
- const jwtPayload = {
-  email: user?.email,
-  role: user?.role,
-}
- //return null; 
- const token = jwt.sign(jwtPayload, "secret", { expiresIn: '1d' });
+  return { token, user };
+};
 
-  return {token, user};
-}
 export const authService = {
   register,
   login,
   refreshToken,
-  changePassword
+  changePassword,
 };
