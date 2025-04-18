@@ -26,7 +26,7 @@ const successOrder = catchAsync(async (req, res)=> {
   if( result.modifiedCount === 0 ){
     throw new AppError(httpStatus.BAD_REQUEST, 'Order was not updated');
   }
-return res.redirect(`${config.frontendBaseUrl}/dashboard/customer/view-order`)
+return res.redirect(`${config.frontendBaseUrl}/successfull-order`)
 })
 // fail order
 const failOrder = catchAsync(async (req, res)=> {
@@ -36,7 +36,7 @@ const failOrder = catchAsync(async (req, res)=> {
   if (result.deletedCount === 0) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete order');
   }
-  return res.redirect(`${config.frontendBaseUrl}/orders/failed`)
+  return res.redirect(`${config.frontendBaseUrl}/failed-order`)
 })
 
 const getAllOrder = catchAsync(async (req, res) => {

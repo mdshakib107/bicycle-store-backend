@@ -10,7 +10,7 @@ import mongoose from 'mongoose';
 
 
 const createOrderIntoDB = async (payload: TOrder) => {
-  console.log(payload);
+  // console.log(payload);
   const session = await mongoose.startSession();
 
 
