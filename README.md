@@ -66,10 +66,9 @@ product and order management, secure login/registration, and payment integration
 1. **Clone the repository**
 ```bash
 git clone https://github.com/yourusername/bicycle-store-backend.git
-
+``
 ---
 
-##1. **Clone the repository**
 2.Install dependencies :
 ```bash
 npm install
