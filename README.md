@@ -64,20 +64,17 @@ product and order management, secure login/registration, and payment integration
 ## 🧪 Installation & Setup
 
 1. **Clone the repository**
+
 ```bash
 git clone https://github.com/yourusername/bicycle-store-backend.git
-
----
-
----
+```
 
 2. **Install dependencies** 
+
 ```bash
 npm install
+```
 
----
-
----
 
 ## 📌 Features
 
@@ -115,10 +112,9 @@ npm install
   - Out-of-stock
   - Unauthorized access
 
----
 
-3.Create .env file :
-
+3.***Create .env file***
+```bash
 NODE_ENV=
 PORT=
 DATABASE_URL=
@@ -132,10 +128,14 @@ RESET_PASS_UI_LINK=
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
-
-4.Run the server :
+```
+4.**Run the server**
+```bash
 npm run dev  # for development
+```
 # or
+```bash
 npm start    # for production
+```
 
 
