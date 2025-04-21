@@ -131,7 +131,7 @@ CLOUDINARY_API_SECRET=
 ```
 4.**Run the server**
 ```bash
-npm run dev  # for development
+npm run start:dev  # for development
 ```
 # or
 ```bash
