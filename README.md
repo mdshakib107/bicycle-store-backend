@@ -110,17 +110,8 @@ npm install
 
 ---
 
-## 🧪 Installation & Setup
-
-1. **Clone the repository**
-```bash
-git clone https://github.com/yourusername/bicycle-store-backend.git
-cd bicycle-store-backend
-
-2.Install dependencies :
-npm install
-
 3.Create .env file :
+
 NODE_ENV=
 PORT=
 DATABASE_URL=
