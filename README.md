@@ -8,7 +8,7 @@ A powerful and secure backend for the Bicycle Store web application built with E
 
 - **Node.js + Express**
 - **TypeScript**
-- ** (MongoDB)**
+- ** Mongoose(MongoDB)**
 - **JWT Authentication**
 - **Role-Based Access Control**
 - **Zod / Joi Validation**
