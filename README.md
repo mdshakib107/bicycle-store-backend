@@ -1,6 +1,6 @@
 # 🚲 Bicycle Store - Backend
 
-A powerful and secure backend for the Bicycle Store web application built with Express, TypeScript, Prisma, and MongoDB.
+A powerful and secure backend for the Bicycle Store web application built with Express, TypeScript, Mongoose  and MongoDB.
 
 ---
 
@@ -8,7 +8,7 @@ A powerful and secure backend for the Bicycle Store web application built with E
 
 - **Node.js + Express**
 - **TypeScript**
-- **Prisma (PostgreSQL/MySQL)** & **Mongoose (MongoDB)**
+- ** ** (MongoDB)**
 - **JWT Authentication**
 - **Role-Based Access Control**
 - **Zod / Joi Validation**
