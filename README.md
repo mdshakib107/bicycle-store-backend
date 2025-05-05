@@ -8,7 +8,7 @@ A powerful and secure backend for the Bicycle Store web application built with E
 
 - **Node.js + Express**
 - **TypeScript**
-- ** ** (MongoDB)**
+- ** (MongoDB)**
 - **JWT Authentication**
 - **Role-Based Access Control**
 - **Zod / Joi Validation**
@@ -68,13 +68,21 @@ npm start
 ```
 src/
 ├── app/
-│   ├── modules/         # Features like users, products, orders
-│   ├── middlewares/     # Auth, error handling
-│   ├── utils/           # Helper functions
-│   ├── config/          # DB and app configuration
-│   ├── interfaces/      # TypeScript types
-│   ├── server.ts        # Main entry file (dev)
-│   └── app.ts           # Express app setup
+│ ├── builder/ # Factory or builder utilities
+│ ├── config/ # Configuration files (env, DB, etc.)
+│ ├── errors/ # Custom error handling
+│ ├── interface/ # TypeScript interfaces
+│ ├── middlewares/ # Express middlewares
+│ ├── modules/ # Main domain logic
+│ │ ├── auth/ # Authentication logic
+│ │ ├── order/ # Order management
+│ │ ├── product/ # Product CRUD
+│ │ └── user/ # User management
+│ ├── routes/ # API route definitions
+│ └── utils/ # Helper utilities
+├── types/ # Global TypeScript types
+├── app.ts # Main app entry
+├── server.ts # HTTP server bootstrap
 ```
 
 ---
